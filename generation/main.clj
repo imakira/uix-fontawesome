@@ -3,10 +3,12 @@
             [uix.core :as uix]
             [uix.dev :as udev]
             [clojure.java.io :as io]
-            [clojure.string :as str]))
+            [clojure.string :as str])
+  (:import [org.jsoup Jsoup]
+           [org.jsoup.parser Parser ParseSettings]))
 
 (def fontawesome-url  "https://github.com/FortAwesome/Font-Awesome/archive/refs/heads/6.x.zip" )
-(def output-dir "./src/uix-fontawesome")
+(def output-dir "./src/uix_fontawesome")
 (def tmp-dir "./out")
 
 (defn set-dimension [data]
@@ -16,9 +18,16 @@
                                {:width 40
                                 :height 32})))))
 
+(defn html->uix [str]
+  (-> str
+      (Jsoup/parse (-> (Parser/htmlParser)
+                       (.settings ParseSettings/preserveCase)))
+      (hickory.core/as-hiccup)
+      (udev/from-hiccup)))
+
 (defn from-html [name str]
   `(~'defui ~(symbol name) []
-    ~(set-dimension (first (udev/from-html str)))))
+    ~(set-dimension (first (html->uix str)))))
 
 (defn prelude [dir-name]
   `((~'ns ~(symbol (str "uix-fontawesome." dir-name))
@@ -30,9 +39,7 @@
        (str/join ".")))
 
 (defn sanitize-name [name]
-  (if (seq (re-matches #"^\d.*$" name))
-    (str "_" name)
-    name))
+  (str "_" name))
 
 (defn init []
   (proc/shell "mkdir -p" output-dir)
@@ -57,6 +64,4 @@
            (map pr-str)
            (str/join "\n")
            (spit (str output-dir "/" dir-name ".cljc"))))))
-
-
 
