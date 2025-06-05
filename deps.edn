@@ -3,9 +3,9 @@
         com.pitch/uix.dom {:mvn/version "1.4.4"}
         babashka/process {:mvn/version "0.6.23"}
         org.clojure/clojurescript {:mvn/version "1.12.42"}
-        org.clojure/clojure {:mvn/version "1.12.0"}
-        imakira/hickory {:git/url "git@github.com:imakira/hickory.git"
-                         :git/sha "8d28e5ea7928ada15fe182c6fd753d2131197d55"}}
+        org.clojure/clojure {:mvn/version "1.12.0"}}
  :aliases {:generation
            {:extra-paths ["generation"]
+            :extra-deps {imakira/hickory {:git/url "git@github.com:imakira/hickory.git"
+                                          :git/sha "8d28e5ea7928ada15fe182c6fd753d2131197d55"}}
             :exec-fn main/generate}}}
