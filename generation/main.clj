@@ -5,7 +5,8 @@
             [clojure.java.io :as io]
             [clojure.string :as str])
   (:import [org.jsoup Jsoup]
-           [org.jsoup.parser Parser ParseSettings]))
+           [org.jsoup.nodes Element]
+           [org.jsoup.parser Tag Parser ParseSettings]))
 
 (def fontawesome-url  "https://github.com/FortAwesome/Font-Awesome/archive/refs/heads/6.x.zip" )
 (def output-dir "./src/uix_fontawesome")
@@ -19,11 +20,11 @@
                                 :height 32})))))
 
 (defn html->uix [str]
-  (-> str
-      (Jsoup/parse (-> (Parser/htmlParser)
-                       (.settings ParseSettings/preserveCase)))
-      (hickory.core/as-hiccup)
-      (udev/from-hiccup)))
+  (->> (-> (Parser/htmlParser)
+           (.settings ParseSettings/preserveCase)
+           (.parseFragmentInput str (Element. (Tag/valueOf "body") "") ""))
+       (map hickory.core/as-hiccup)
+       (map udev/from-hiccup)))
 
 (defn from-html [name str]
   `(~'defui ~(symbol name) []
